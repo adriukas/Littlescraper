@@ -22,3 +22,9 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+.env
+.gemini/
+.agents/
+node_modules/
+public/build/
+/.vscode
