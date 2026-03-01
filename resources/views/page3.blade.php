@@ -11,16 +11,16 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-6 mx-auto text-center shadow p-5 bg-white rounded">
-                    <h1 class="fw-bold text-primary">Welcome to Vinted Bot Scraper</h1>
+                    <h1 class="fw-bold text-primary">Welcome to Bot Scraper</h1>
                     <p class="text-muted mb-4">Please choose which bot channel info interests You today</p>
-<button type="button" class="btn btn-primary">V-tool</button>
-<button type="button" class="btn btn-secondary">Astral</button>
-<button type="button" class="btn btn-success">Success</button>
-<button type="button" class="btn btn-danger">Danger</button>
-<button type="button" class="btn btn-warning">Warning</button>
-<button type="button" class="btn btn-info">Info</button>
-<button type="button" class="btn btn-light">Light</button>
-        <a href="/" class="btn btn-dark btn-lg px-3"> Log out</a></form>                
+                        <a href="page4" class="btn btn-secondary">ParallelResellers</a></form>   
+                        <button type="button" class="btn btn-secondary">Astral</button>
+                        <button type="button" class="btn btn-success">Success</button>
+                        <button type="button" class="btn btn-danger">Danger</button>
+                        <button type="button" class="btn btn-warning">Warning</button>
+                        <button type="button" class="btn btn-info">Info</button>
+                        <button type="button" class="btn btn-light">Light</button>
+                        <a href="/" class="btn btn-dark btn-lg px-3"> Log out</a></form>                
         </div>
     </main>
 </body>
