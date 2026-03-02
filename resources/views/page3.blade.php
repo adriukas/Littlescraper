@@ -12,15 +12,17 @@
             <div class="row">
                 <div class="col-lg-6 mx-auto text-center shadow p-5 bg-white rounded">
                     <h1 class="fw-bold text-primary">Welcome to Bot Scraper</h1>
-                    <p class="text-muted mb-4">Please choose which bot channel info interests You today</p>
-                        <a href="page4" class="btn btn-secondary">ParallelResellers</a></form>   
-                        <button type="button" class="btn btn-secondary">Astral</button>
-                        <button type="button" class="btn btn-success">Success</button>
-                        <button type="button" class="btn btn-danger">Danger</button>
-                        <button type="button" class="btn btn-warning">Warning</button>
-                        <button type="button" class="btn btn-info">Info</button>
-                        <button type="button" class="btn btn-light">Light</button>
-                        <a href="/" class="btn btn-dark btn-lg px-3"> Log out</a></form>                
+                    <p class="text-muted mb-4">Choose a bot to scrape:</p>
+                    
+                    <a href="/page4?bot=ParallelResellers&type=PARALLEL" class="btn btn-secondary mb-2">ParallelResellers</a>
+                    <a href="/page4?bot=VintedSeekers&type=VINTED" class="btn btn-success mb-2">VintedSeekers</a>
+                    <a href="/page4?bot=BartoResell&type=BARTO" class="btn btn-info mb-2">BartoResell</a>
+                    <a href="/page4?bot=Astral&type=ASTRAL" class="btn btn-dark mb-2">Astral</a>
+                    <a href="/page4?bot=FlipFlow&type=FLIPFLOW" class="btn btn-warning mb-2">FLIPFLOW</a>
+
+                    <hr>
+                    <a href="/" class="btn btn-outline-danger">Log out</a>
+                </div>              
         </div>
     </main>
 </body>

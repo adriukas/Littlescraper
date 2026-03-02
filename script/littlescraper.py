@@ -1,3 +1,5 @@
+#TODO: if there is embed take not the bot name but the inside user name
+#if I press scrape again, it should add the new data or write that there is nothing to add
 import requests
 import json
 import sys
@@ -17,24 +19,32 @@ results = []
 
 if isinstance(messages, list):
     for msg in messages:
-        # checking if the message has an embed 
+        # Bot Embeds 
         if msg.get('embeds'):
             for embed in msg['embeds']:
-                title = embed.get('title', '')
-                if "success" in title.lower():
+                if "success" in embed.get('title', '').lower() or "secured" in embed.get('title', '').lower():
                     extracted = {
-                        'username': msg.get('author', {}).get('username', 'Unknown'),
-                        'timestamp': msg.get('timestamp', ''),
-
-                        'content': title
+                        'type': 'bot_success',
+                        'user': msg['author']['username'],
+                        'item': 'Success Box',
+                        'text': embed.get('description', 'No details'),
+                        'time': msg['timestamp']
                     }
-
+                    
                     if embed.get('fields'):
                         for field in embed['fields']:
-                            name = field.get('name', '').lower()
-                            value = field.get('value', '')
-                            if "article" in name or "price" in name:
-                                extracted['content'] += f" | {value}"
+                            if "article" in field['name'].lower() or "utilisateur" in field['name'].lower(): extracted['item'] = field['value']
+                            if "price" in field['name'].lower() or "prix" in field['name'].lower(): extracted['text'] = f"Price: {field['value']}"
                     results.append(extracted)
+
+        #Member messages
+        elif msg.get('content'):
+            results.append({
+                'type': 'user_chat',
+                'user': msg['author']['username'],
+                'item': 'Discussion',
+                'text': msg['content'],
+                'time': msg['timestamp']
+            })
 
 print(json.dumps(results))
