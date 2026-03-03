@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="fw-bold text-primary">Scraping: {{ $botName }}</h1>
-        <a href="/page3" class="btn btn-outline-secondary">Back to Bot List</a>
-    </div>
+TODO:check where price is gbp where eur
+@extends('layouts.website') 
+@section('title', 'Login - Discord Scraper')
+@section('content') 
+
 
     <div class="card shadow-sm mb-4">
         <div class="card-body text-center">
@@ -15,15 +10,15 @@
                 @csrf
                 <input type="hidden" name="channel_id" value="{{ $channelId }}">
                 <input type="hidden" name="bot_name" value="{{ $botName }}">
-                <button type="submit" class="btn btn-primary btn-lg px-5">Click to scrape</button>
+                <button type="submit" class="btn btn-secondary btn-lg px-5 mt-3">Click to scrape {{ $botName }}</button>
             </form>
         </div>
     </div>
 
     @if(isset($purchases) && count($purchases) > 0)
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-dark">
+        <div class="table-responsive rounded-table-container shadow-sm mb-5">
+            <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
                     <tr>
                         <th>Author</th>
                         <th>Type</th>
@@ -32,6 +27,7 @@
                         <th>Time</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     @foreach($purchases as $item)
                         <tr class="{{ $item['type'] == 'bot_success' ? 'table-success' : '' }}">
@@ -56,3 +52,6 @@
         </div>
     @endif
 </div>
+
+
+@endsection
