@@ -26,8 +26,10 @@ class ScraperController extends Controller
         return view('page4', [
             'purchases' => $data,
             'botName' => $botName,
-            'channelId' => $channelId
+            'channelId' => $channelId,
         ]);
+        
+
     }
     return back()->with('error', 'Scraper crashed: ' . $result->errorOutput());
     }
