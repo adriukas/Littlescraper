@@ -24,18 +24,18 @@
 
             <div class="ms-auto d-flex align-items-center gap-2">
             
-            @if(Request::routeIs('scraper') || Request::is('run-scrape*'))               
+            @if(Request::routeIs('scraper') || Request::is('run-scrape'))               
              <a href="/page3" class="btn btn-outline-light btn-sm">Back to bot list</a>
             @endif
             
             @if(!Request::is('/') && !Request::is('page2'))
-                <a href="/" class="btn btn-outline-danger btn-sm">Log out</a>
+            <a href="/" class="btn btn-outline-danger btn-sm">Log out</a>
             @endif
         </div>
     </nav>
 
     <main class="container">
-        @yield('content') {{-- This is where your Bootstrap Table will appear --}}
+        @yield('content')
     </main>
 
 </body>
