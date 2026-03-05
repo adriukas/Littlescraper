@@ -1,11 +1,14 @@
 # PHP su Apache serveris
-FROM php:8.2-apache
+FROM php:8.4-apache
 
 # MySQL 
 RUN docker-php-ext-install pdo pdo_mysql
 
 # Python 
 RUN apt-get update && apt-get install -y python3 python3-pip
+
+# need this for python script to work
+RUN pip3 install requests --break-system-packages
 
 #Apache mod_rewrite (for laravel routing)
 RUN a2enmod rewrite
