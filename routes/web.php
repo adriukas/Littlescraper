@@ -19,7 +19,7 @@ Route::get('/page3', function () {
     return view('page3');
 })->name('home');
 
-Route::post('/run-scrape', [ScraperController::class, 'runScraper']);
+Route::match(['get', 'post'], '/run-scrape', [ScraperController::class, 'runScraper'])->name('run.scrape');
 
 Route::get('/page4', function (Request $request) {
     if (!session('is_logged_in')) {
@@ -50,3 +50,6 @@ Route::post('/login-check', function (Request $request) {
 
     return back()->with('error', 'Invalid email or password.');
 });
+
+Route::get('/history_sales', [ScraperController::class, 'showHistory'])->name('history.sales');
+Route::get('/history_messages', [ScraperController::class, 'showHistory'])->name('history.messages');

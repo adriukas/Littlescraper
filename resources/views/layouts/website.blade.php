@@ -24,7 +24,7 @@
 
             <div class="ms-auto d-flex align-items-center gap-2">
             
-            @if(Request::routeIs('scraper') || Request::is('run-scrape'))               
+            @if(Request::routeIs('scraper') || Request::is('run-scrape') || Request::is('history_messages') || Request::is('history_sales'))               
              <a href="/page3" class="btn btn-outline-light btn-sm">Back to bot list</a>
             @endif
             

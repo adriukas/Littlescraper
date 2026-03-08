@@ -1,6 +1,8 @@
 @extends('layouts.website') 
 @section('title', 'Scraper - ' . $botName)
 
+// sutvarkyti sita puslapi, kad rodytu tik pardavimus, o ne zinutes (kaip messages.blade.php) 
+
 @section('content') 
 
     <section class="card shadow-sm border-0 mb-4 text-center p-4">

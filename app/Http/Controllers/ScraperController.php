@@ -10,8 +10,10 @@ use Carbon\Carbon;
 class ScraperController extends Controller
 {
     public function runScraper(Request $request) {
-        $channelId = $request->input('channel_id');
-        $botName = $request->input('bot_name'); 
+        $botName = $request->input('bot_name') ?? $request->query('bot');
+        $botType = $request->input('type') ?? $request->query('type');
+        
+        $channelId = $request->input('channel_id') ?? env("ID_" . $botType);
         
         $token = env('DISCORD_TOKEN');
         $scriptPath = base_path('script/littlescraper.py');
@@ -25,7 +27,6 @@ class ScraperController extends Controller
                 return back()->with('error', 'No data found.');
             }
 
-            // Bots
             DB::table('bots')->updateOrInsert(
                 ['discord_channel_id' => $channelId],
                 ['name' => $botName, 'updated_at' => now()]
@@ -33,7 +34,6 @@ class ScraperController extends Controller
             
             $dbBot = DB::table('bots')->where('discord_channel_id', $channelId)->first();
 
-            // Messages
             foreach ($data as &$item) {
                 if (preg_match('/Price:\s*([\d\.]+)/i', $item['text'], $matches)) {
                     $item['price'] = (float)$matches[1];
@@ -46,12 +46,11 @@ class ScraperController extends Controller
                     'author'     => $item['user'],
                     'content'    => $item['text'], 
                     'price'      => $item['price'], 
-                    'scraped_at' => \Carbon\Carbon::parse($item['time']),
+                    'scraped_at' => Carbon::parse($item['time']),
                     'created_at' => now(),
                 ]);
             }
 
-            // Scrape history
             DB::table('scrape_history')->insert([
                 'bot_id'        => $dbBot->id,
                 'records_found' => count($data),
@@ -59,17 +58,54 @@ class ScraperController extends Controller
                 'created_at'    => now(),
             ]);
 
-
             $totalSum = array_sum(array_column($data, 'price'));
+
+        
+            if ($botType === 'ASTRAL' || $botType === 'FLIPFLOW') {
+                return view('messages', [
+                    'purchases' => $data,
+                    'botName' => $botName,
+                    'channelId' => $channelId
+                ]);
+            }
 
             return view('page4', [
                 'purchases' => $data,
                 'botName' => $botName,
                 'channelId' => $channelId,
-                'totalSum' => $totalSum // Perduodame sumą į puslapį
+                'totalSum' => $totalSum 
             ]);
-                    }
+        }
 
         return back()->with('error', 'Error: ' . $result->errorOutput());
+    }
+
+public function showHistory() {
+    $query = DB::table('scraped_data')
+        ->join('bots', 'scraped_data.bot_id', '=', 'bots.id')
+        ->select('scraped_data.*', 'bots.name as bot_name');
+
+    if (request()->is('history_messages')) {
+        $purchases = $query->whereIn('bots.name', ['Astral', 'FlipFlow'])
+                           ->orderBy('scraped_at', 'desc')
+                           ->paginate(15);
+        
+        return view('history_messages', [
+            'purchases' => $purchases,
+            'totalSum' => 0 
+        ]);
+    }
+
+    $purchases = $query->whereIn('bots.name', ['ParallelResellers', 'VintedSeekers', 'BartoResell'])
+                       ->orderBy('scraped_at', 'desc')
+                       ->paginate(15);
+
+    $totalSum = $query->whereIn('bots.name', ['ParallelResellers', 'VintedSeekers', 'BartoResell'])
+                      ->sum('price');
+
+    return view('history_sales', [
+        'purchases' => $purchases,
+        'totalSum' => $totalSum
+    ]);
     }
 }

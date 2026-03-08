@@ -1,6 +1,6 @@
-#TODO: if there is embed take not the bot name but the inside user name
-#if I press scrape again, it should add the new data or write that there is nothing to add
-#if there is more then 100 purchases it should scrape the next 100 and so on until there is nothing to scrape anymore
+#TODO: kai scrapinu purchases, tik pirmas psl rodo pilna kaina, reik sutvarkyt sita dalyka
+#chathistory reik prideti carda
+#jei scrapinu tai duomenys uzsiraso daug kartu, reik patikrinti ar jau yra ir tada prirasyti
 import requests
 import json
 import sys
