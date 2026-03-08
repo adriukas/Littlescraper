@@ -34,15 +34,20 @@ class ScraperController extends Controller
             $dbBot = DB::table('bots')->where('discord_channel_id', $channelId)->first();
 
             // Messages
-            foreach ($data as $item) {
+            foreach ($data as &$item) {
+                if (preg_match('/Price:\s*([\d\.]+)/i', $item['text'], $matches)) {
+                    $item['price'] = (float)$matches[1];
+                } else {
+                    $item['price'] = 0; 
+                }
+
                 DB::table('scraped_data')->insert([
                     'bot_id'     => $dbBot->id, 
                     'author'     => $item['user'],
-                    'content'    => $item['text'],
-                    'item_name'  => $item['item'],
-                    'scraped_at' => Carbon::parse($item['time']),
+                    'content'    => $item['text'], 
+                    'price'      => $item['price'], 
+                    'scraped_at' => \Carbon\Carbon::parse($item['time']),
                     'created_at' => now(),
-                    'updated_at' => now(),
                 ]);
             }
 
@@ -54,13 +59,16 @@ class ScraperController extends Controller
                 'created_at'    => now(),
             ]);
 
+
+            $totalSum = array_sum(array_column($data, 'price'));
+
             return view('page4', [
                 'purchases' => $data,
-                'botName'   => $botName,
+                'botName' => $botName,
                 'channelId' => $channelId,
-                'totalSum'  => 0 
+                'totalSum' => $totalSum // Perduodame sumą į puslapį
             ]);
-        }
+                    }
 
         return back()->with('error', 'Error: ' . $result->errorOutput());
     }
