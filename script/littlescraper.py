@@ -29,14 +29,14 @@ if isinstance(messages, list):
             # Bot Embeds 
             if msg.get('embeds'):
                 for embed in msg['embeds']:
-                    if "success" in embed.get('title', '').lower() or "secured" in embed.get('title', '').lower():
-                        extracted = {
-                            'type': 'bot_success',
-                            'user': msg['author']['username'],
-                            'item': 'Success Box',
-                            'text': embed.get('description', 'No details'),
-                            'time': msg['timestamp']
-                        }
+                    # Sukuriame objektą tik čia
+                    extracted = {
+                        'type': 'bot_success',
+                        'user': msg['author']['username'],
+                        'item': 'Success Box',
+                        'text': embed.get('description', 'No details'),
+                        'time': msg['timestamp']
+                    }
                     
                     if embed.get('fields'):
                         for field in embed['fields']:

@@ -2,9 +2,9 @@
 
 @section('content')
 <div class="container">
-    <section class="card shadow-sm border-0 mb-4 text-center p-4">
-        <h2>Purchases scraping history</h2>
-        <div class="h4 text-success">Total value: {{ number_format($totalSum, 2) }} €</div>
+    <section class="card shadow-sm border-0 mb-4  p-4">
+        <small class="text-muted d-block">Purchases scraping history total value</small>
+        <span class="h3 fw-bold text-success mb-0">{{ number_format($totalSum, 2) }} €</span>
     </section> <div class="table-responsive shadow-sm border rounded">
         <table class="table table-hover mb-0">
             <thead class="table-dark">
