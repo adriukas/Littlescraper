@@ -9,7 +9,7 @@ use App\Models\ScrapedData;
 class ScraperController extends Controller
 {
     protected $scraperService;
-
+    // adding scraperService to the constructor 
     public function __construct(ScraperService $scraperService)
     {
         $this->scraperService = $scraperService;
@@ -17,78 +17,83 @@ class ScraperController extends Controller
 
     public function runScraper(Request $request)
     {
-        // 1. Pasiimame parametrus
         $botName = $request->input('bot_name') ?? $request->query('bot');
         $botType = $request->input('type') ?? $request->query('type');
+        
         $channelId = $request->input('channel_id') ?? env("ID_" . $botType);
 
-        // 2. Automatiškai nustatome vaizdo (view) pavadinimą pagal bota
-        // Pridedame visus botus iš tavo nuotraukos į atitinkamas grupes
         $messageBots = ['ASTRAL', 'FLIPFLOW', 'PARALLEL', 'ARCHIEV', 'DOTB']; 
-        
-        // Tikriname, ar botType yra žinučių grupėje
         $viewName = in_array($botType, $messageBots) ? 'messages' : 'sales';
 
-        // 3. JEI TAI GET UŽKLAUSA (tik užeiname į bota iš Page 3)
         if ($request->isMethod('get')) {
             return view($viewName, [
                 'botName' => $botName,
                 'channelId' => $channelId,
-                'purchases' => null // Lentelė nebus rodoma
+                'purchases' => null 
             ]);
         }
 
-        // 4. JEI TAI POST UŽKLAUSA (paspaudėme "Scrape" mygtuką)
+        $request->validate([
+            'channel_id' => 'required|numeric|digits_between:15,25',
+            'bot_name'   => 'required|string|min:3|max:50',
+            'type'       => 'required|alpha|uppercase',
+        ], [
+            'channel_id.numeric' => 'Discord ID has to be numbers.',
+            'bot_name.min' => 'Bot name is too short.'
+        ]);
+
         $data = $this->scraperService->scrape($botName, $botType, $channelId);
 
-        // Apsauga, jei skreperis nieko nerado arba Python sugedo
         if ($data === null) {
             return back()->with('error', 'Scraper failed to connect to Discord.');
         }
 
         $totalSum = array_sum(array_column($data, 'price'));
 
-        // Grąžiname tą patį vaizdą su gautais duomenimis
         return view($viewName, [
-            'purchases' => $data, // Čia perduodame sugrąžintus duomenis
-            'data' => $data,      // Kai kurios tavo Blade versijos naudoja $data
-            'botName' => $botName,
+            'purchases' => $data,
             'channelId' => $channelId,
-            'totalSum' => $totalSum
+            'botName'   => $botName,
+            'totalSum'  => $totalSum
         ]);
     }
-
     public function showHistory(Request $request)
     {
-        $isChat = $request->is('history_messages');
         $query = ScrapedData::with('bot');
 
-        if ($isChat) {
-            // 1. Patikriname ar vartotojas pasirinko konkretų botą
-            $selectedBot = $request->query('bot');
-
-            $query->whereHas('bot', function($q) use ($selectedBot) {
-                if ($selectedBot) {
-                    // Jei pasirinktas botas, filtruojame tik jį
-                    $q->where('name', $selectedBot);
-                } else {
-                    // Jei nepasirinkta, rodome abu
-                    $q->whereIn('name', ['Astral', 'FlipFlow']);
-                }
-            });
+        if ($request->is('history/messages')) {
+            $query->where('price', 0);
             $view = 'history_messages';
-            $totalSum = 0;
         } else {
-            // Tavo esama Sales logika...
-            $query->whereHas('bot', function($q) {
-                $q->whereIn('name', ['ParallelResellers', 'VintedSeekers', 'BartoResell']);
-            });
+            $query->where('price', '>', 0);
             $view = 'history_sales';
-            $totalSum = (clone $query)->sum('price'); 
+        }
+
+        if ($request->has('bot')) {
+            $botName = $request->query('bot');
+            $query->whereHas('bot', function($q) use ($botName) {
+                $q->where('name', $botName);
+            });
         }
 
         $purchases = $query->orderBy('scraped_at', 'desc')->paginate(15);
+        
+        $totalSum = ($view === 'history_sales') ? $query->sum('price') : 0;
 
         return view($view, compact('purchases', 'totalSum'));
     }
+    public function destroy($id)
+        {
+        $data = ScrapedData::find($id);
+
+        if (!$data) {
+            return back()->with('error', 'Įrašas nerastas.');
+        }
+
+        $data->delete();
+
+        \Illuminate\Support\Facades\Log::info("[ScraperController@destroy] Admin deleted record ID: " . $id);
+
+        return back()->with('success', 'Record deleted successfully.');
+}
 }

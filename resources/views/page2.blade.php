@@ -11,7 +11,7 @@
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
-        <form method="POST" action="/login-check">
+        <form method="POST" action="{{ route('login.check') }}">
             @csrf
             <div class="mb-3">
                 <label class="form-label">Email address</label>

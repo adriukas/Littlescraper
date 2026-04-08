@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ScrapeHistory extends Model
 {
+
     protected $table = 'scrape_history';
 
     protected $fillable = [

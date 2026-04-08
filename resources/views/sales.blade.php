@@ -3,7 +3,7 @@
 
 @section('content') 
     <section class="card shadow-sm border-0 mb-4 text-center p-4">
-        <form action="/run-scrape" method="POST">
+        <form action="{{ route('run.scrape') }}" method="POST">
             @csrf
             <input type="hidden" name="channel_id" value="{{ $channelId }}">
             <input type="hidden" name="bot_name" value="{{ $botName }}">

@@ -1,6 +1,3 @@
-#TODO: kai scrapinu purchases, tik pirmas psl rodo pilna kaina, reik sutvarkyt sita dalyka
-#chathistory reik prideti carda
-#jei scrapinu tai duomenys uzsiraso daug kartu, reik patikrinti ar jau yra ir tada prirasyti
 import requests
 import json
 import sys
@@ -19,17 +16,14 @@ def get_messages(channel_id):
 
 messages = get_messages(CHANNEL_ID)
 results = []
-cutoff_time = datetime.now(timezone.utc) - timedelta(hours=24)
+cutoff_time = datetime.now(timezone.utc) - timedelta(hours=500)
 
 if isinstance(messages, list):
     for msg in messages:
         msg_time = datetime.fromisoformat(msg['timestamp'])        
-        
         if msg_time > cutoff_time:        
-            # Bot Embeds 
             if msg.get('embeds'):
                 for embed in msg['embeds']:
-                    # Sukuriame objektą tik čia
                     extracted = {
                         'type': 'bot_success',
                         'user': msg['author']['username'],

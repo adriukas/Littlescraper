@@ -24,7 +24,6 @@
                class="nav-link {{ request('bot') == 'DotB' ? 'bg-secondary text-white' : 'bg-light text-dark border' }} me-2">
                DotB
             </a>
-
         </div>
     </div>
 
@@ -36,6 +35,9 @@
                     <th>Author</th>
                     <th>Message</th>
                     <th>Time</th>
+                    @if(session('user_email') === env('ADMIN_EMAIL'))
+                        <th>Actions</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -45,10 +47,26 @@
                         <td class="fw-bold">{{ $item->author }}</td>
                         <td>{{ $item->content }}</td>
                         <td class="text-muted small">{{ \Carbon\Carbon::parse($item->scraped_at)->diffForHumans() }}</td>
+                        
+                        @if(session('user_email') === env('ADMIN_EMAIL'))
+                        <td>
+                            <div class="d-flex gap-1">
+                                <form action="{{ route('history.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Do you really want to delete this message?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                                <button class="btn btn-sm btn-info text-white" onclick="alert('Editing functionality is available only to Admins')">Edit</button>
+                            </div>
+                        </td>
+                        @endif
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="text-center py-4 text-muted">No messages found for this filter.</td>
+                        {{-- Dinamiškas colspan: jei Adminas, stulpelių 5, jei ne - 4 --}}
+                        <td colspan="{{ session('user_email') === env('ADMIN_EMAIL') ? 5 : 4 }}" class="text-center py-4 text-muted">
+                            No messages found for this filter.
+                        </td>
                     </tr>
                 @endforelse
             </tbody>
@@ -56,6 +74,7 @@
     </div>
 
     <div class="mt-4 d-flex justify-content-center">
-            {{ $purchases->appends(request()->query())->links('pagination::bootstrap-4') }} 
+        {{ $purchases->appends(request()->query())->links('pagination::bootstrap-4') }} 
+    </div>
 </div>
 @endsection

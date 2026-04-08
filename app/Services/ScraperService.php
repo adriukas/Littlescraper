@@ -7,6 +7,7 @@ use App\Models\Bot;
 use App\Models\ScrapedData;
 use App\Models\ScrapeHistory;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class ScraperService
 {
@@ -32,12 +33,14 @@ class ScraperService
         $token = env('DISCORD_TOKEN');
         $scriptPath = base_path('script/littlescraper.py');
 
-        $result = Process::run("python3 {$scriptPath} {$token} {$channelId}");
-
+        $result = Process::run("python3 {$scriptPath} \"{$token}\" \"{$channelId}\"");
+        
         if (!$result->successful()) {
+            Log::error("[ScraperService@runPythonScraper] Python process failed. Error: " . $result->errorOutput());
             return null;
         }
 
+        Log::info("[ScraperService@runPythonScraper] Successfully executed for channel: " . $channelId);
         return json_decode($result->output(), true);
     }
 
@@ -51,24 +54,22 @@ class ScraperService
 
 private function storeScrapedMessages($data, $botId)
 {
-    foreach ($data as &$item) { // Naudojame &, kad galėtume papildyti $item masyvą kaina
+    foreach ($data as &$item) { 
         $scrapedAt = Carbon::parse($item['time']);
 
-        // 1. Ištraukiame kainą iš teksto
+        // Ištraukiame kainą iš teksto
         if (preg_match('/Price:\s*([\d\.]+)/i', $item['text'], $matches)) {
             $item['price'] = (float)$matches[1];
         } else {
             $item['price'] = 0;
         }
 
-        // 2. Patikriname, ar toks įrašas jau egzistuoja
         $exists = ScrapedData::where('bot_id', $botId)
             ->where('author', $item['user'])
             ->where('content', $item['text'])
             ->where('scraped_at', $scrapedAt)
             ->exists();
 
-        // 3. Įrašome į bazę TIK JEI tai nauja žinutė
         if (!$exists) {
             ScrapedData::create([
                 'bot_id'     => $botId,
@@ -80,7 +81,7 @@ private function storeScrapedMessages($data, $botId)
         }
     }
 
-    return $data; // Grąžiname VISUS duomenis (senus + naujus) rodymui lentelėje
+    return $data; 
 }
 
     private function storeHistory($botId, $count)
