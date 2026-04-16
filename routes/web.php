@@ -14,6 +14,9 @@ Route::get('/login', function () {
     return view('page2');
 })->name('login');
 
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+
 Route::post('/login-check', function (Request $request) {
     $request->validate([
         'email' => 'required|email',
@@ -23,8 +26,12 @@ Route::post('/login-check', function (Request $request) {
     $email = $request->input('email');
     $password = $request->input('password');
 
-    if (($email === env('ADMIN_EMAIL') && $password === env('ADMIN_PASSWORD')) || 
-        ($email === env('USER2_EMAIL') && $password === env('USER2_PASSWORD'))) {
+    $user = User::where('email', $email)->first();
+
+    if ($user && \Illuminate\Support\Facades\Hash::check($password, $user->password)) {
+        
+        Auth::login($user); 
+
         session(['is_logged_in' => true, 'user_email' => $email]);
         return redirect()->route('home');
     }
@@ -41,7 +48,7 @@ Route::middleware([])->group(function () {
         return view('page3');
     })->name('home');
 
-    // Skrepinimas
+    // Skreipinimas
     Route::match(['get', 'post'], '/run-scrape', [ScraperController::class, 'runScraper'])->name('run.scrape');
 
     // Istorija

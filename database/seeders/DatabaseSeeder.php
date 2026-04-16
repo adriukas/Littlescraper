@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // 2. create bots mentioned in my project
+        /* 2. create bots mentioned in my project
         $botNames = ['ParallelResellers', 'Astral', 'FlipFlow', 'Archiev', 'DotB'];
         $bots = [];
 
@@ -44,6 +44,6 @@ class DatabaseSeeder extends Seeder
             ScrapedData::factory()->count(2000)->create([
                 'bot_id' => $bot->id
             ]);
-        }
+        }*/
     }
 }
