@@ -24,7 +24,6 @@
             <tbody>
                 @forelse($purchases as $item)
                     <tr>
-                        {{-- Naudojame ryšį su Bot modeliu --}}
                         <td><span class="badge bg-success">{{ $item->bot->name ?? 'N/A' }}</span></td>
                         <td class="fw-bold">{{ $item->author }}</td>
                         <td>{{ $item->item_name ?? 'Success Box' }}</td>

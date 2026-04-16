@@ -63,7 +63,6 @@
                     </tr>
                 @empty
                     <tr>
-                        {{-- Dinamiškas colspan: jei Adminas, stulpelių 5, jei ne - 4 --}}
                         <td colspan="{{ session('user_email') === env('ADMIN_EMAIL') ? 5 : 4 }}" class="text-center py-4 text-muted">
                             No messages found for this filter.
                         </td>

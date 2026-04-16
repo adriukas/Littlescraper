@@ -29,7 +29,7 @@ Route::post('/login-check', function (Request $request) {
         return redirect()->route('home');
     }
 
-    return back()->with('error', 'Neteisingi duomenys.');
+    return back()->with('error', 'Incorrect credentials.');
 })->name('login.check');
 
 
