@@ -20,6 +20,13 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make(env('ADMIN_PASSWORD', 'password')),
             ]
         );
+        User::updateOrCreate(
+            ['email' => env('USER2_EMAIL', 'user@example.com')],
+            [
+                'name' => 'Regular User',
+                'password' => Hash::make(env('USER2_PASSWORD', 'password')),
+            ]
+        );
 
         // 2. create bots mentioned in my project
         $botNames = ['ParallelResellers', 'Astral', 'FlipFlow', 'Archiev', 'DotB'];

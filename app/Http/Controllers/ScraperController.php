@@ -18,7 +18,6 @@ class ScraperController extends Controller
     public function runScraper(Request $request)
     {
 
-        // 1. Try to get data from POST, then URL query, then Session as a last resort
         $botName = $request->input('bot_name') 
                 ?? $request->query('bot') 
                 ?? session('last_bot_name');
@@ -27,16 +26,13 @@ class ScraperController extends Controller
                 ?? $request->query('type') 
                 ?? session('last_bot_type');
 
-        // 2. If we still don't have a botName, we shouldn't even show the page
         if (!$botName) {
             return redirect()->route('home')->with('error', 'Please select a bot first.');
         }
 
-        // 3. Save the current bot to the session so if the user refreshes, the button stays labeled
         session(['last_bot_name' => $botName, 'last_bot_type' => $botType]);
 
 
-        
         $channelId = $request->input('channel_id') ?? env("ID_" . $botType);
 
         $messageBots = ['ASTRAL', 'FLIPFLOW', 'PARALLEL', 'ARCHIEV', 'DOTB']; 
@@ -61,27 +57,20 @@ class ScraperController extends Controller
 
         $data = $this->scraperService->scrape($botName, $botType, $channelId);
 
-        // ... inside runScraper method, after $data = $this->scraperService->scrape(...)
-
         if ($data === null) {
             return back()->with('error', 'Scraper failed to connect to Discord.');
         }
 
-        // --- NEW FILTERING LOGIC START ---
         $yesterday = now()->subDay();
 
-        // Turn the array into a collection and filter it
         $filteredData = collect($data)->filter(function ($item) use ($yesterday) {
-            // Assuming 'time' is the key in your scraped array
             return \Carbon\Carbon::parse($item['time'])->gte($yesterday);
         })->values()->all(); // Reset array keys and convert back to array
-        // --- NEW FILTERING LOGIC END ---
 
-        // Recalculate the sum based ONLY on the filtered 24h data
         $totalSum = array_sum(array_column($filteredData, 'price'));
 
         return view($viewName, [
-            'purchases' => $filteredData, // Pass the filtered data instead of $data
+            'purchases' => $filteredData, 
             'channelId' => $channelId,
             'botName'   => $botName,
             'totalSum'  => $totalSum
