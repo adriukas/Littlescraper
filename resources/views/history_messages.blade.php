@@ -3,27 +3,18 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4"> 
-        <div class="nav nav-pills">
-            <a href="{{ route('history.messages', ['bot' => 'ParallelResellers']) }}" 
-               class="nav-link {{ request('bot') == 'ParallelResellers' ? 'bg-secondary text-white' : 'bg-light text-dark border'}} me-2">
-               ParallelResellers
+        <div class="nav nav-pills overflow-auto flex-nowrap pb-2">
+            <a href="{{ route('history.messages') }}" 
+               class="nav-link {{ !request('bot') ? 'bg-primary text-white' : 'bg-light text-dark border' }} me-2">
+               All Messages
             </a>
-            <a href="{{ route('history.messages', ['bot' => 'Astral']) }}" 
-               class="nav-link {{ request('bot') == 'Astral' ? 'bg-secondary text-white' : 'bg-light text-dark border' }} me-2">
-               Astral
-            </a>
-            <a href="{{ route('history.messages', ['bot' => 'FlipFlow']) }}" 
-               class="nav-link {{ request('bot') == 'FlipFlow' ? 'bg-secondary text-white' : 'bg-light text-dark border' }} me-2">
-               FlipFlow
-            </a>
-            <a href="{{ route('history.messages', ['bot' => 'Archiev']) }}" 
-               class="nav-link {{ request('bot') == 'Archiev' ? 'bg-secondary text-white' : 'bg-light text-dark border' }} me-2">
-               Archiev
-            </a>
-            <a href="{{ route('history.messages', ['bot' => 'DotB']) }}" 
-               class="nav-link {{ request('bot') == 'DotB' ? 'bg-secondary text-white' : 'bg-light text-dark border' }} me-2">
-               DotB
-            </a>
+
+            @foreach(\App\Models\Bot::all() as $filterBot)
+                <a href="{{ route('history.messages', ['bot' => $filterBot->name]) }}" 
+                   class="nav-link {{ request('bot') == $filterBot->name ? 'bg-secondary text-white' : 'bg-light text-dark border'}} me-2">
+                   {{ $filterBot->name }}
+                </a>
+            @endforeach
         </div>
     </div>
 
@@ -43,7 +34,7 @@
             <tbody>
                 @forelse($purchases as $item)
                     <tr>
-                        <td><span class="badge bg-info text-dark">{{ $item->bot->name }}</span></td>
+                        <td><span class="badge bg-info text-dark">{{ $item->bot->name ?? 'Deleted Bot' }}</span></td>
                         <td class="fw-bold">{{ $item->author }}</td>
                         <td>{{ $item->content }}</td>
                         <td class="text-muted small">{{ \Carbon\Carbon::parse($item->scraped_at)->diffForHumans() }}</td>
@@ -51,21 +42,48 @@
                         @if(session('user_email') === env('ADMIN_EMAIL'))
                         <td>
                             <div class="d-flex gap-1">
-                                <form action="{{ route('history.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Do you really want to delete this message?')">
+                                <form action="{{ route('history.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Delete this record permanently?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                 </form>
-                                <button class="btn btn-sm btn-info text-white" onclick="alert('Editing functionality is available only to Admins')">Edit</button>
+                                
+                                <button class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#editMsg{{ $item->id }}">Edit</button>
                             </div>
                         </td>
+
+                        <div class="modal fade" id="editMsg{{ $item->id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <form action="{{ route('history.update', $item->id) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <div class="modal-content text-dark">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Edit Record</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body text-start">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">Author</label>
+                                                <input type="text" name="author" class="form-control" value="{{ $item->author }}">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">Content</label>
+                                                <textarea name="content" class="form-control" rows="3">{{ $item->content }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Update</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                         @endif
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ session('user_email') === env('ADMIN_EMAIL') ? 5 : 4 }}" class="text-center py-4 text-muted">
-                            No messages found for this filter.
-                        </td>
+                        <td colspan="5" class="text-center py-4 text-muted">No records found.</td>
                     </tr>
                 @endforelse
             </tbody>

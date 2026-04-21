@@ -2,9 +2,24 @@
 
 @section('content')
 <div class="container">
-    <section class="card shadow-sm border-0 mb-4 p-4">
-        <small class="text-muted d-block">Purchases scraping history total value</small>
-        <span class="h3 fw-bold text-success mb-0">{{ number_format($totalSum, 2) }} €</span>
+    <div class="d-flex justify-content-between align-items-center mb-4"> 
+        <div class="nav nav-pills overflow-auto flex-nowrap pb-2">
+            <a href="{{ route('history.sales') }}" 
+               class="nav-link {{ !request('bot') ? 'bg-primary text-white' : 'bg-light text-dark border' }} me-2">
+               All Sales
+            </a>
+            @foreach(\App\Models\Bot::where('type', 'SALES')->get() as $filterBot)
+                <a href="{{ route('history.sales', ['bot' => $filterBot->name]) }}" 
+                   class="nav-link {{ request('bot') == $filterBot->name ? 'bg-success text-white' : 'bg-light text-dark border'}} me-2">
+                   {{ $filterBot->name }}
+                </a>
+            @endforeach
+        </div>
+    </div>
+
+    <section class="card shadow-sm border-0 mb-4 p-4 text-center">
+        <small class="text-muted d-block fw-bold">TOTAL VALUE FOR SELECTED FILTER</small>
+        <span class="h2 fw-bold text-success mb-0">{{ number_format($totalSum, 2) }} €</span>
     </section> 
 
     <div class="table-responsive shadow-sm border rounded bg-white">
@@ -14,7 +29,7 @@
                     <th>Bot</th>
                     <th>Author</th>
                     <th>Item</th>
-                    <th>Price (€)</th>
+                    <th>Price</th>
                     <th>Time</th>
                     @if(session('user_email') === env('ADMIN_EMAIL'))
                         <th>Actions</th>
@@ -28,33 +43,55 @@
                         <td class="fw-bold">{{ $item->author }}</td>
                         <td>{{ $item->item_name ?? 'Success Box' }}</td>
                         <td class="text-success fw-bold">{{ number_format($item->price, 2) }} €</td>
-                        <td class="text-muted small">{{ \Carbon\Carbon::parse($item->scraped_at)->diffForHumans() }}</td>
+                        <td class="text-muted small">{{ $item->scraped_at->diffForHumans() }}</td>
                         
                         @if(session('user_email') === env('ADMIN_EMAIL'))
                         <td>
                             <div class="d-flex gap-1">
-                                <form action="{{ route('history.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Do you really want to delete this sale?')">
-                                    @csrf
-                                    @method('DELETE')
+                                <form action="{{ route('history.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Delete?')">
+                                    @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                 </form>
-                                <button class="btn btn-sm btn-info text-white" onclick="alert('Editing functionality is available only to Admins')">Edit</button>
+                                <button class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#editSale{{ $item->id }}">Edit</button>
                             </div>
                         </td>
+
+                        <div class="modal fade text-dark" id="editSale{{ $item->id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <form action="{{ route('history.update', $item->id) }}" method="POST">
+                                    @csrf @method('PUT')
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-light">
+                                            <h5 class="modal-title">Edit Sale Record</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body text-start">
+                                            <div class="mb-3">
+                                                <label class="fw-bold">Author</label>
+                                                <input type="text" name="author" class="form-control" value="{{ $item->author }}">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="fw-bold">Price (€)</label>
+                                                <input type="number" step="0.01" name="price" class="form-control" value="{{ $item->price }}">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                         @endif
                     </tr>
                 @empty
-                    <tr>
-                        <td colspan="{{ session('user_email') === env('ADMIN_EMAIL') ? 6 : 5 }}" class="text-center py-4 text-muted">
-                            No sales history found.
-                        </td>
-                    </tr>
+                    <tr><td colspan="6" class="text-center py-4">No data.</td></tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 
-    <div class="mt-4 d-flex justify-content-center">
+    <div class="mt-4">
         {{ $purchases->appends(request()->query())->links('pagination::bootstrap-4') }}
     </div>
 </div>

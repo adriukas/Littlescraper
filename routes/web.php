@@ -81,6 +81,7 @@ Route::middleware([])->group(function () {
     Route::get('/history/sales', [ScraperController::class, 'showHistory'])->name('history.sales');
     Route::get('/history/messages', [ScraperController::class, 'showHistory'])->name('history.messages');
     Route::delete('/history/{id}', [ScraperController::class, 'destroy'])->name('history.destroy');
+    Route::put('/history/{id}', [ScraperController::class, 'update'])->name('history.update');
 
     Route::get('/logout', function () {
         Auth::logout();

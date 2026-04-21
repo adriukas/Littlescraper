@@ -61,16 +61,22 @@ public function runScraper(Request $request)
 }
     public function showHistory(Request $request)
     {
-        $query = ScrapedData::with('bot');
+        $query = \App\Models\ScrapedData::with('bot');
 
+        // Atskiriame Sales nuo Messages
         if ($request->is('history/messages')) {
-            $query->where('price', 0);
+            $query->whereHas('bot', function($q) {
+                $q->where('type', 'MESSAGE');
+            });
             $view = 'history_messages';
         } else {
-            $query->where('price', '>', 0);
+            $query->whereHas('bot', function($q) {
+                $q->where('type', 'SALES');
+            });
             $view = 'history_sales';
         }
 
+        // Filtravimas pagal boto vardą
         if ($request->has('bot')) {
             $botName = $request->query('bot');
             $query->whereHas('bot', function($q) use ($botName) {
@@ -78,9 +84,11 @@ public function runScraper(Request $request)
             });
         }
 
+        // SVARBU: Sumą skaičiuojame PRIEŠ puslapiavimą
+        $totalSum = $query->sum('price');
+
+        // Gauname duomenis su puslapiavimu
         $purchases = $query->orderBy('scraped_at', 'desc')->paginate(15);
-        
-        $totalSum = ($view === 'history_sales') ? $query->sum('price') : 0;
 
         return view($view, compact('purchases', 'totalSum'));
     }
@@ -98,4 +106,17 @@ public function runScraper(Request $request)
 
         return back()->with('success', 'Record deleted successfully.');
 }
+    public function update(Request $request, $id)
+    {
+        $item = \App\Models\ScrapedData::findOrFail($id);
+
+        $item->update([
+            'author'  => $request->author,
+            'price'   => $request->price ?? $item->price,
+            'content' => $request->content ?? $item->content,
+            'item_name' => $request->item_name ?? $item->item_name,
+        ]);
+
+        return back()->with('success', 'Record updated successfully!');
+    }
 }

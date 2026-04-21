@@ -16,7 +16,13 @@ class ScrapedData extends Model
         'author',
         'content',
         'price',
-        'scraped_at'
+        'scraped_at',
+        'item_name' 
+    ];
+
+    protected $casts = [
+        'scraped_at' => 'datetime',
+        'price' => 'float',
     ];
 
     public function bot()
