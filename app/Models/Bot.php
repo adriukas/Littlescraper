@@ -11,7 +11,9 @@ class Bot extends Model
 
     protected $fillable = [
         'name',
-        'discord_channel_id'
+        'discord_channel_id',
+        'token',
+        'type'
     ];
 
     public function scrapedData()

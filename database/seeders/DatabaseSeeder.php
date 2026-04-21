@@ -26,7 +26,37 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Regular User',
                 'password' => Hash::make(env('USER2_PASSWORD', 'password')),
             ]
+        
         );
+            
+            $bots = [
+                [
+                    'name' => 'ASTRAL',
+                    'discord_channel_id' => env('ID_ASTRAL'),
+                    'token' => env('DISCORD_TOKEN'),
+                ],
+                [
+                    'name' => 'FLIPFLOW',
+                    'discord_channel_id' => env('ID_FLIPFLOW'),
+                    'token' => env('DISCORD_TOKEN'),
+                ],
+                [
+                    'name' => 'PARALLEL',
+                    'discord_channel_id' => env('ID_PARALLEL'),
+                    'token' => env('DISCORD_TOKEN'),
+                ],
+            ];
+
+
+            foreach ($bots as $botData) {
+                // Naudojame updateOrCreate, kad netyčia nesidubliuotų
+                Bot::updateOrCreate(
+                    ['discord_channel_id' => $botData['discord_channel_id']],
+                    ['name' => $botData['name'], 'token' => $botData['token']]
+                );
+            }
+        }
+                
 
         /* 2. create bots mentioned in my project
         $botNames = ['ParallelResellers', 'Astral', 'FlipFlow', 'Archiev', 'DotB'];
@@ -45,5 +75,4 @@ class DatabaseSeeder extends Seeder
                 'bot_id' => $bot->id
             ]);
         }*/
-    }
-}
+};

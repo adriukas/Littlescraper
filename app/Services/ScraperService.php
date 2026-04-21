@@ -30,17 +30,23 @@ class ScraperService
 
     private function runPythonScraper($channelId)
     {
-        $token = env('DISCORD_TOKEN');
-        $scriptPath = base_path('script/littlescraper.py');
+        // Surandame botą duomenų bazėje
+        $bot = Bot::where('discord_channel_id', $channelId)->first();
+        
+        // Paimame tokeną iš DB, o jei jo nėra - naudojame atsarginį iš .env
+        $token = ($bot && $bot->token) ? $bot->token : env('DISCORD_TOKEN'); 
 
+        $scriptPath = base_path('script/littlescraper.py');
+        
+        // Paleidžiame Python skriptą VIENĄ KARTĄ su teisingais duomenimis
         $result = Process::run("python3 {$scriptPath} \"{$token}\" \"{$channelId}\"");
         
         if (!$result->successful()) {
-            Log::error("[ScraperService@runPythonScraper] Python process failed. Error: " . $result->errorOutput());
+            Log::error("[ScraperService@runPythonScraper] Python process failed: " . $result->errorOutput());
             return null;
         }
 
-        Log::info("[ScraperService@runPythonScraper] Successfully executed for channel: " . $channelId);
+        Log::info("[ScraperService@runPythonScraper] Success for channel: " . $channelId);
         return json_decode($result->output(), true);
     }
 

@@ -15,67 +15,50 @@ class ScraperController extends Controller
         $this->scraperService = $scraperService;
     }
 
-    public function runScraper(Request $request)
-    {
+public function runScraper(Request $request)
+{
+    $botName   = $request->input('bot_name');
+    $channelId = $request->input('channel_id');
+    $botType   = $request->input('type'); 
 
-        $botName = $request->input('bot_name') 
-                ?? $request->query('bot') 
-                ?? session('last_bot_name');
+    $viewName = ($botType === 'MESSAGE') ? 'messages' : 'sales';
 
-        $botType = $request->input('type') 
-                ?? $request->query('type') 
-                ?? session('last_bot_type');
-
-        if (!$botName) {
-            return redirect()->route('home')->with('error', 'Please select a bot first.');
-        }
-
-        session(['last_bot_name' => $botName, 'last_bot_type' => $botType]);
-
-
-        $channelId = $request->input('channel_id') ?? env("ID_" . $botType);
-
-        $messageBots = ['ASTRAL', 'FLIPFLOW', 'PARALLEL', 'ARCHIEV', 'DOTB']; 
-        $viewName = in_array($botType, $messageBots) ? 'messages' : 'sales';
-
-        if ($request->isMethod('get')) {
-            return view($viewName, [
-                'botName' => $botName,
-                'channelId' => $channelId,
-                'purchases' => null 
-            ]);
-        }
-
-        $request->validate([
-            'channel_id' => 'required|numeric|digits_between:15,25',
-            'bot_name'   => 'required|string|min:3|max:50',
-            'type'       => 'required|alpha|uppercase',
-        ], [
-            'channel_id.numeric' => 'Discord ID has to be numbers.',
-            'bot_name.min' => 'Bot name is too short.'
-        ]);
-
-        $data = $this->scraperService->scrape($botName, $botType, $channelId);
-
-        if ($data === null) {
-            return back()->with('error', 'Scraper failed to connect to Discord.');
-        }
-
-        $yesterday = now()->subDay();
-
-        $filteredData = collect($data)->filter(function ($item) use ($yesterday) {
-            return \Carbon\Carbon::parse($item['time'])->gte($yesterday);
-        })->values()->all(); // Reset array keys and convert back to array
-
-        $totalSum = array_sum(array_column($filteredData, 'price'));
-
+    // 1. Jei tai GET užklausa, TIK parodome tuščią puslapį (be lentelės)
+    if ($request->isMethod('get')) {
         return view($viewName, [
-            'purchases' => $filteredData, 
+            'botName' => $botName,
             'channelId' => $channelId,
-            'botName'   => $botName,
-            'totalSum'  => $totalSum
+            'purchases' => null, // Svarbu: perduodame null, kad Blade nerodytų lentelės
+            'totalSum' => 0
         ]);
     }
+
+    // 2. Jei tai POST užklausa (paspaudei mygtuką), Vykdome skrepinimą
+    $request->validate([
+        'channel_id' => 'required|numeric',
+        'bot_name'   => 'required|string',
+    ]);
+
+    $data = $this->scraperService->scrape($botName, $botType, $channelId);
+
+    if ($request->has('debug')) {
+        dd($data);
+    }
+
+    $yesterday = now()->subDay();
+    $filteredData = collect($data)->filter(function ($item) use ($yesterday) {
+        return \Carbon\Carbon::parse($item['time'])->gte($yesterday);
+    })->values()->all();
+
+    $totalSum = array_sum(array_column($filteredData, 'price'));
+
+    return view($viewName, [
+        'purchases' => $filteredData, 
+        'channelId' => $channelId,
+        'botName'   => $botName,
+        'totalSum'  => $totalSum ?? 0
+    ]);
+}
     public function showHistory(Request $request)
     {
         $query = ScrapedData::with('bot');

@@ -3,18 +3,15 @@
 
 @section('content') 
     <section class="card shadow-sm border-0 mt-5 mb-4 text-center p-4">
-        <form action="{{ route('run.scrape', ['bot' => $botName, 'type' => request('type')]) }}" method="POST">
-            @csrf
+        <form action="{{ route('run.scrape') }}" method="POST"> @csrf
             <input type="hidden" name="channel_id" value="{{ $channelId }}">
             <input type="hidden" name="bot_name" value="{{ $botName }}">
-            <input type="hidden" name="type" value="{{ request()->query('type') }}">
-            <button type="submit" class="btn btn-warning text-white btn-lg px-5 shadow-sm">
+            <input type="hidden" name="type" value="MESSAGE"> <button type="submit" class="btn btn-warning text-white btn-lg px-5 shadow-sm">
                 <i class="bi bi-chat-dots me-2"></i> Scrape Chat: {{ $botName }}
             </button>
         </form>
     </section>
 
-    {{-- Check if $purchases is an array --}}
     @if(is_array($purchases))
         
         @if(count($purchases) > 0)
