@@ -108,12 +108,21 @@ public function runScraper(Request $request)
 }
     public function update(Request $request, $id)
     {
+        // 1. Neleidžiame išsaugoti tuščio autoriaus ar turinio
+        $request->validate([
+            'author'  => 'required|string|max:255',
+            'content' => 'required|string',
+            'price'   => 'nullable|numeric',
+            'item_name' => 'nullable|string|max:255',
+        ]);
+
         $item = \App\Models\ScrapedData::findOrFail($id);
 
+        // Jei validacija praėjo, duomenys bus saugūs
         $item->update([
-            'author'  => $request->author,
-            'price'   => $request->price ?? $item->price,
-            'content' => $request->content ?? $item->content,
+            'author'    => $request->author,
+            'price'     => $request->price ?? $item->price,
+            'content'   => $request->content,
             'item_name' => $request->item_name ?? $item->item_name,
         ]);
 

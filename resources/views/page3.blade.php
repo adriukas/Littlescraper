@@ -79,10 +79,10 @@
 
         <hr class="my-5">
 
-        <p class="text-muted mb-3 fw-bold">Data management</p>
+        <p class="text-black mb-3 fw-bold">Data management</p>
         <div class="d-flex justify-content-center gap-3 mb-5">
             <a href="{{ route('history.sales') }}" class="btn btn-outline-secondary px-4">
-                <i class="bi bi-graph-up"></i> Sales history
+                <i class="bi bi-graph-up"></i> Purchases history
             </a>
             <a href="{{ route('history.messages') }}" class="btn btn-outline-secondary px-4">
                 <i class="bi bi-chat-left-text"></i> Messages history
@@ -92,13 +92,29 @@
         @if(session('user_email') === env('ADMIN_EMAIL'))
             <div class="mt-4 p-4 bg-light rounded border shadow-sm text-start">
                 <p class="text-danger fw-bold mb-3"><i class="bi bi-shield-lock"></i> Admin panel</p>
-                
+                    {{-- Klaidos pranesimas --}}
+                    @if ($errors->any())
+                        <div class="alert alert-danger mb-4 shadow-sm border-start border-danger border-4">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    {{-- Sėkmės pranešimas --}}
+                    @if(session('success'))
+                        <div class="alert alert-success mb-4 shadow-sm border-start border-success border-4">
+                            {{ session('success') }}
+                        </div>
+                    @endif
                 <form action="{{ route('bots.store') }}" method="POST">
                     @csrf
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label class="small fw-bold">Bot name</label>
-                            <input type="text" name="name" class="form-control" placeholder="e.g. ALPHA" required>
+                            <input type="text" name="name" class="form-control" placeholder="e.g. Alpha" required>
                         </div>
                         <div class="col-md-3">
                             <label class="small fw-bold">Discord channel ID</label>
@@ -116,7 +132,7 @@
                             </select>
                         </div>
                         <div class="col-12 text-end mt-3">
-                            <button type="submit" class="btn btn-dark px-4">
+                            <button type="submit" class="btn btn-secondary px-4">
                                 <i class="bi bi-plus-circle"></i> Add to database
                             </button>
                         </div>

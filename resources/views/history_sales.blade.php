@@ -1,12 +1,29 @@
 @extends('layouts.website')
 
 @section('content')
+
+@if ($errors->any())
+    <div class="alert alert-danger shadow-sm border-start border-danger border-4">
+        <h6 class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i> Mistake:</h6>
+        <ul class="mb-0 small">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+@if(session('success'))
+    <div class="alert alert-success shadow-sm border-start border-success border-4 py-2">
+        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+    </div>
+@endif
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4"> 
         <div class="nav nav-pills overflow-auto flex-nowrap pb-2">
             <a href="{{ route('history.sales') }}" 
-               class="nav-link {{ !request('bot') ? 'bg-primary text-white' : 'bg-light text-dark border' }} me-2">
-               All Sales
+               class="nav-link {{ !request('bot') ? 'bg-success text-white' : 'bg-light text-dark border' }} me-2">
+               All sales
             </a>
             @foreach(\App\Models\Bot::where('type', 'SALES')->get() as $filterBot)
                 <a href="{{ route('history.sales', ['bot' => $filterBot->name]) }}" 
@@ -18,7 +35,7 @@
     </div>
 
     <section class="card shadow-sm border-0 mb-4 p-4 text-center">
-        <small class="text-muted d-block fw-bold">TOTAL VALUE FOR SELECTED FILTER</small>
+        <small class="d-block fw-bold">Total value:</small>
         <span class="h2 fw-bold text-success mb-0">{{ number_format($totalSum, 2) }} €</span>
     </section> 
 
@@ -52,7 +69,7 @@
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                 </form>
-                                <button class="btn btn-sm btn-info text-white" data-bs-toggle="modal" data-bs-target="#editSale{{ $item->id }}">Edit</button>
+                                <button class="btn btn-sm btn-secondary text-white" data-bs-toggle="modal" data-bs-target="#editSale{{ $item->id }}">Edit</button>
                             </div>
                         </td>
 
@@ -62,7 +79,7 @@
                                     @csrf @method('PUT')
                                     <div class="modal-content">
                                         <div class="modal-header bg-light">
-                                            <h5 class="modal-title">Edit Sale Record</h5>
+                                            <h5 class="modal-title">Edit purchase record</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                         </div>
                                         <div class="modal-body text-start">
@@ -76,7 +93,7 @@
                                             </div>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                            <button type="submit" class="btn btn-primary">Save changes</button>
                                         </div>
                                     </div>
                                 </form>
