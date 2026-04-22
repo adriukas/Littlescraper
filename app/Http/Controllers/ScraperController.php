@@ -23,12 +23,12 @@ public function runScraper(Request $request)
 
     $viewName = ($botType === 'MESSAGE') ? 'messages' : 'sales';
 
-    // 1. Jei tai GET užklausa, TIK parodome tuščią puslapį (be lentelės)
+    // Jei tai GET užklausa, TIK parodome tuščią puslapį (be lentelės)
     if ($request->isMethod('get')) {
         return view($viewName, [
             'botName' => $botName,
             'channelId' => $channelId,
-            'purchases' => null, // Svarbu: perduodame null, kad Blade nerodytų lentelės
+            'purchases' => null, 
             'totalSum' => 0
         ]);
     }

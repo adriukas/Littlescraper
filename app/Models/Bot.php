@@ -10,10 +10,7 @@ class Bot extends Model
     protected $table = 'bots';
 
     protected $fillable = [
-        'name',
-        'discord_channel_id',
-        'token',
-        'type'
+    'name', 'type', 'token', 'discord_channel_id', 'last_scraped_at'
     ];
 
     public function scrapedData()

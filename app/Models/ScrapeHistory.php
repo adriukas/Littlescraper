@@ -10,8 +10,6 @@ class ScrapeHistory extends Model
     protected $table = 'scrape_history';
 
     protected $fillable = [
-        'bot_id',
-        'records_found',
-        'status'
+    'bot_id', 'records_found', 'status', 'execution_time', 'error_log', 'request_ip'
     ];
 }

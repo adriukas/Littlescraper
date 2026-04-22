@@ -90,12 +90,15 @@ private function storeScrapedMessages($data, $botId)
     return $data; 
 }
 
-    private function storeHistory($botId, $count)
+    private function storeHistory($botId, $count, $executionTime = 0, $error = null)
     {
-        ScrapeHistory::create([
+        \App\Models\ScrapeHistory::create([
             'bot_id' => $botId,
             'records_found' => $count,
-            'status' => 'success'
+            'status' => $error ? 'failed' : 'success',
+            'execution_time' => $executionTime, 
+            'error_log' => $error,             
+            'request_ip' => request()->ip()    
         ]);
     }
 }
