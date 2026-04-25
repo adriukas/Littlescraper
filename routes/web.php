@@ -82,7 +82,7 @@ Route::middleware([])->group(function () {
     Route::get('/history/messages', [ScraperController::class, 'showHistory'])->name('history.messages');
     Route::delete('/history/{id}', [ScraperController::class, 'destroy'])->name('history.destroy');
     Route::put('/history/{id}', [ScraperController::class, 'update'])->name('history.update');
-
+Route::put('/bots/{id}', [ScraperController::class, 'updateBot'])->name('bots.update');
     Route::get('/logout', function () {
         Auth::logout();
         session()->forget(['is_logged_in', 'user_email']);

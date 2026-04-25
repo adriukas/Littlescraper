@@ -7,18 +7,15 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <style>
-        /* Pagrindinis šriftas švarumui */
         body { 
             font-family: sans-serif; 
         }
 
-        /* Pilka navigacijos juosta */
         .navbar-grey {
             background-color: #6c757d !important; /* Klasikinė pilka */
             padding: 0.8rem 0;
         }
 
-        /* Pavadinimo stilius: paryškintas, viena dalis žalia, kita geltona */
         .brand-bold {
             font-weight: 800;
             text-transform: uppercase;
@@ -47,12 +44,11 @@
 
             <div class="ms-auto d-flex align-items-center gap-2">
                 @if(Request::routeIs('run.scrape') || Request::routeIs('history.*'))               
-                    <a href="{{ route('home') }}" class="btn btn-outline-light btn-sm">Back to bot list</a>
+                    <a href="{{ route('home') }}" class="btn btn-outline-light btn-sm text-uppercase">Back to bot list</a>
                 @endif
                 
                 @if(session('is_logged_in'))
-                    <span class="text-white small me-3">{{ session('user_email') }}</span>
-                    <a href="{{ route('logout') }}" class="btn btn-danger btn-sm">Log out</a>
+                    <a href="{{ route('logout') }}" class="btn btn-danger text-uppercase btn-sm">Log out</a>
                 @endif
             </div>
         </div>

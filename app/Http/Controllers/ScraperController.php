@@ -108,7 +108,7 @@ public function runScraper(Request $request)
 }
     public function update(Request $request, $id)
     {
-        // 1. Neleidžiame išsaugoti tuščio autoriaus ar turinio
+        // Neleidžiame išsaugoti tuščio autoriaus ar turinio
         $request->validate([
             'author'  => 'required|string|max:255',
             'content' => 'required|string',
@@ -128,4 +128,20 @@ public function runScraper(Request $request)
 
         return back()->with('success', 'Record updated successfully!');
     }
+    public function updateBot(Request $request, $id)
+{
+    $request->validate([
+        'name' => 'required|string|max:50',
+        'discord_channel_id' => 'required|numeric', // Tikrina duomenų tipą (pattern)
+    ]);
+
+    $bot = \App\Models\Bot::findOrFail($id);
+    
+    $bot->update([
+        'name' => $request->name,
+        'discord_channel_id' => $request->discord_channel_id,
+    ]);
+
+    return redirect()->back()->with('success', 'Bot details updated successfully!');
+}
 }
