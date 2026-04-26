@@ -23,17 +23,16 @@ cutoff_time = datetime.now(timezone.utc) - timedelta(hours=500)
 
 if isinstance(messages, list):
     for msg in messages:
-        # Laiko sutvarkymas
         timestamp_str = msg['timestamp'].replace('Z', '+00:00')
         msg_time = datetime.fromisoformat(timestamp_str)
         
         if msg_time > cutoff_time:
             content = msg.get('content', '')
-            # Tikriname, ar žinutėje yra pirkimo požymių (raktiniai žodžiai arba nuorodos)
+            
             is_purchase_text = any(word in content.lower() for word in ["secured", "success", "bought", "purchased", "vinted"])
             has_link = "discord.gg" in content or "vinted" in content.lower()
 
-            # 1. APDOROJAME EMBEDS (Botų pranešimai rėmeliuose)
+            # APDOROJAME EMBEDS 
             if msg.get('embeds'):
                 for embed in msg['embeds']:
                     extracted = {
@@ -74,7 +73,7 @@ if isinstance(messages, list):
 
                     results.append(extracted)
 
-            # 2. APDOROJAME PAPRASTĄ TEKSTĄ (Content)
+            # 2. APDOROJAME PAPRASTĄ TEKSTĄ
             elif content:
                 item_type = 'user_chat'
                 item_name = 'Discussion'

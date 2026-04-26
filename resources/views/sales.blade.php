@@ -8,7 +8,7 @@
             <input type="hidden" name="channel_id" value="{{ $channelId }}">
             <input type="hidden" name="bot_name" value="{{ $botName }}">
             <input type="hidden" name="type" value="SALES"> <button type="submit" class="btn btn-success btn-lg px-5 shadow-sm">
-                <i class="bi bi-cart-check me-2"></i> Scrape latest purchases in: {{ $botName }}
+                <i class=" me-2"></i> Scrape latest purchases in: {{ $botName }}
             </button>
         </form>
     </section>

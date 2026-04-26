@@ -46,13 +46,18 @@
                                             <div class="row g-2">
                                                 <div class="col-6">
                                                     <label class="small fw-bold text-uppercase">Name</label>
-                                                    <input type="text" name="name" class="form-control form-control-sm" value="{{ $bot->name }}" required>
+                                                    {{-- Naudojame old, jei yra klaida, kitu atveju rodomas dabartinis vardas --}}
+                                                    <input type="text" name="name" class="form-control form-control-sm" value="{{ old('name', $bot->name) }}" required>
                                                 </div>
                                                 <div class="col-6">
                                                     <label class="small fw-bold text-uppercase">Channel ID</label>
-                                                    <input type="text" name="discord_channel_id" class="form-control form-control-sm" value="{{ $bot->discord_channel_id }}" required>
+                                                    <input type="text" name="discord_channel_id" class="form-control form-control-sm" value="{{ old('discord_channel_id', $bot->discord_channel_id) }}" required>
                                                 </div>
-                                                <div class="col-12 mt-2">
+                                                <div class="col-12 mt-1">
+                                                    <label class="small fw-bold text-uppercase">Token</label>
+                                                    <input type="password" name="token" class="form-control form-control-sm" value="{{ old('token', $bot->token) }}" required>
+                                                </div>
+                                                <div class="col-12 mt-2 text-center">
                                                     <button type="submit" class="btn btn-dark btn-sm w-100 text-uppercase">Save changes</button>
                                                 </div>
                                             </div>
@@ -138,42 +143,32 @@
                     Admin panel / Add new bot
                 </p>
 
-                @if ($errors->any())
-                    <div class="alert alert-danger border-0 shadow-sm mb-4">
-                        <ul class="mb-0 small fw-bold">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
 
-                @if(session('success'))
-                    <div class="alert alert-success border-0 shadow-sm mb-4 fw-bold small text-center">
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                <form action="{{ route('bots.store') }}" method="POST">
+                                <form action="{{ route('bots.store') }}" method="POST">
                     @csrf
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label class="small fw-bold text-secondary text-uppercase">Bot name</label>
-                            <input type="text" name="name" class="form-control border-0 shadow-sm" placeholder="Alpha" required>
+                            <input type="text" name="name" class="form-control border-0 shadow-sm" 
+                                value="{{ old('name') }}" placeholder="Alpha" required>
                         </div>
                         <div class="col-md-3">
                             <label class="small fw-bold text-secondary text-uppercase">Channel ID</label>
-                            <input type="text" name="discord_channel_id" class="form-control border-0 shadow-sm" placeholder="12345..." required>
+                            {{-- PRIDĖTA: old('discord_channel_id') --}}
+                            <input type="text" name="discord_channel_id" class="form-control border-0 shadow-sm" 
+                                value="{{ old('discord_channel_id') }}" placeholder="12345..." required>
                         </div>
                         <div class="col-md-3">
                             <label class="small fw-bold text-secondary text-uppercase">Token</label>
+                            {{-- Tokenams old() paprastai nenaudojamas saugumo sumetimais, bet jei reikalavimas griežtas: --}}
                             <input type="password" name="token" class="form-control border-0 shadow-sm" placeholder="Secret" required>
                         </div>
                         <div class="col-md-3">
                             <label class="small fw-bold text-secondary text-uppercase">Category</label>
                             <select name="type" class="form-select border-0 shadow-sm" required>
-                                <option value="SALES">Purchasing bot</option>
-                                <option value="MESSAGE">Messages bot</option>
+                                {{-- PRIDĖTA: loginis patikrinimas, kuris pasirinkimas buvo pažymėtas --}}
+                                <option value="SALES" {{ old('type') == 'SALES' ? 'selected' : '' }}>Purchasing bot</option>
+                                <option value="MESSAGE" {{ old('type') == 'MESSAGE' ? 'selected' : '' }}>Messages bot</option>
                             </select>
                         </div>
                         <div class="col-12 text-end mt-4">

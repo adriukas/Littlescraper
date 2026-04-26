@@ -2,22 +2,7 @@
 
 @section('content')
 
-@if ($errors->any())
-    <div class="alert alert-danger shadow-sm border-start border-danger border-4">
-        <h6 class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i> Mistake:</h6>
-        <ul class="mb-0 small">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
 
-@if(session('success'))
-    <div class="alert alert-success shadow-sm border-start border-success border-4 py-2">
-        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-    </div>
-@endif
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4"> 
         <div class="nav nav-pills overflow-auto flex-nowrap pb-2">
@@ -82,7 +67,7 @@
                                         <div class="modal-body text-start">
                                             <div class="mb-3">
                                                 <label class="form-label fw-bold">Author</label>
-                                                <input type="text" name="author" class="form-control" value="{{ $item->author }}">
+                                                <input type="text" name="author" class="form-control" value="{{ old('author', $item->author) }}">
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label fw-bold">Content</label>

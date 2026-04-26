@@ -7,7 +7,7 @@
             <input type="hidden" name="channel_id" value="{{ $channelId }}">
             <input type="hidden" name="bot_name" value="{{ $botName }}">
             <input type="hidden" name="type" value="MESSAGE"> <button type="submit" class="btn btn-warning text-white btn-lg px-5 shadow-sm">
-                <i class="bi bi-chat-dots me-2 text-uppercase"></i> Scrape latest messages in: {{ $botName }}
+                <i class="me-2 text-uppercase"></i> Scrape latest messages in: {{ $botName }}
             </button>
         </form>
     </section>

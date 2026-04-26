@@ -5,33 +5,25 @@
 <div class="d-flex align-items-center justify-content-center" style="min-height: 80vh;">
     <div class="card p-5 shadow-lg bg-white border-0 rounded-4" style="width: 100%; max-width: 450px;">
         
-        <h2 class="text-center mb-4 fw-bold text-uppercase  ">
+        <h2 class="text-center mb-4 fw-bold text-uppercase">
             <span class="text-success">Log</span> <span class="text-warning">in</span>
         </h2>
         
         <p class="text-muted text-center small mb-4">Enter your credentials</p>
 
-        @if(session('error'))
-            <div class="alert alert-danger py-2 small border-0 shadow-sm text-center">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        @if ($errors->any())
-            <div class="alert alert-danger py-2 small border-0 shadow-sm">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        {{-- Kadangi website.blade.php jau turi klaidų rodymą, šiuos blokus čia gali pasilikti 
+             tik jei nori specifinio dizaino būtent šiame lange. --}}
 
         <form method="POST" action="{{ route('login.check') }}">
             @csrf
             <div class="mb-3">
                 <label class="form-label fw-semibold small text-secondary text-uppercase">Email address</label>
-                <input type="email" name="email" class="form-control form-control-lg fs-6" placeholder="admin@example.com" required>
+                <input type="email" 
+                       name="email" 
+                       class="form-control form-control-lg fs-6" 
+                       placeholder="admin@example.com" 
+                       value="{{ old('email') }}" 
+                       required autofocus>
             </div>
 
             <div class="mb-3">
