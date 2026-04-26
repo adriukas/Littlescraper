@@ -12,67 +12,58 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. create or update
         User::updateOrCreate(
             ['email' => env('ADMIN_EMAIL', 'admin@example.com')],
             [
-                'name' => 'Admin',
+                'name'     => 'Admin',
                 'password' => Hash::make(env('ADMIN_PASSWORD', 'password')),
             ]
         );
+
         User::updateOrCreate(
             ['email' => env('USER2_EMAIL', 'user@example.com')],
             [
-                'name' => 'Regular User',
+                'name'     => 'Regular User',
                 'password' => Hash::make(env('USER2_PASSWORD', 'password')),
             ]
-        
         );
-            
-            $bots = [
+
+        $bots = [
+            [
+                'name'               => 'ASTRAL',
+                'discord_channel_id' => env('ID_ASTRAL'),
+                'token'              => env('DISCORD_TOKEN'),
+                'type'               => 'SALES',
+            ],
+            [
+                'name'               => 'FLIPFLOW',
+                'discord_channel_id' => env('ID_FLIPFLOW'),
+                'token'              => env('DISCORD_TOKEN'),
+                'type'               => 'SALES',
+            ],
+            [
+                'name'               => 'PARALLEL',
+                'discord_channel_id' => env('ID_PARALLEL_neveikia'),
+                'token'              => env('DISCORD_TOKEN'),
+                'type'               => 'SALES',
+            ],
+        ];
+
+        foreach ($bots as $botData) {
+            Bot::updateOrCreate(
+                ['discord_channel_id' => $botData['discord_channel_id']],
                 [
-                    'name' => 'ASTRAL',
-                    'discord_channel_id' => env('ID_ASTRAL'),
-                    'token' => env('DISCORD_TOKEN'),
-                ],
-                [
-                    'name' => 'FLIPFLOW',
-                    'discord_channel_id' => env('ID_FLIPFLOW'),
-                    'token' => env('DISCORD_TOKEN'),
-                ],
-                [
-                    'name' => 'PARALLEL',
-                    'discord_channel_id' => env('ID_PARALLEL'),
-                    'token' => env('DISCORD_TOKEN'),
-                ],
-            ];
-
-
-            foreach ($bots as $botData) {
-                // Naudojame updateOrCreate, kad netyčia nesidubliuotų
-                Bot::updateOrCreate(
-                    ['discord_channel_id' => $botData['discord_channel_id']],
-                    ['name' => $botData['name'], 'token' => $botData['token']]
-                );
-            }
-        }
-                
-
-        /* 2. create bots mentioned in my project
-        $botNames = ['ParallelResellers', 'Astral', 'FlipFlow', 'Archiev', 'DotB'];
-        $bots = [];
-
-        foreach ($botNames as $name) {
-            $bots[] = Bot::updateOrCreate(
-                ['name' => $name],
-                ['discord_channel_id' => fake()->numerify('##################')]
+                    'name'  => $botData['name'],
+                    'token' => $botData['token'],
+                    'type'  => $botData['type'],
+                ]
             );
         }
 
-        // 3. creating 2000 fro every bot
-        foreach ($bots as $bot) {
-            ScrapedData::factory()->count(2000)->create([
-                'bot_id' => $bot->id
-            ]);
-        }*/
-};
+        // Seed 10000 scraped_data records for the first SALES bot
+        $bot = Bot::where('type', 'SALES')->first();
+        if ($bot && ScrapedData::count() < 10000) {
+            ScrapedData::factory()->count(10000)->create(['bot_id' => $bot->id]);
+        }
+    }
+}

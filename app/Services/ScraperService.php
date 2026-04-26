@@ -19,9 +19,11 @@ class ScraperService
             return null;
         }
 
-        $bot = $this->storeBot($botName, $channelId);
+        $bot = $this->syncBot($botName, $channelId);
 
         $processedData = $this->storeScrapedMessages($data, $bot->id);
+
+        $bot->update(['last_scraped_at' => now()]);
 
         $this->storeHistory($bot->id, count($processedData));
 
@@ -30,17 +32,12 @@ class ScraperService
 
     private function runPythonScraper($channelId)
     {
-        // Surandame botą duomenų bazėje
         $bot = Bot::where('discord_channel_id', $channelId)->first();
-        
-        // Paimame tokeną iš DB, o jei jo nėra - naudojame atsarginį iš .env
-        $token = ($bot && $bot->token) ? $bot->token : env('DISCORD_TOKEN'); 
-
+        $token = ($bot && $bot->token) ? $bot->token : env('DISCORD_TOKEN');
         $scriptPath = base_path('script/littlescraper.py');
-        
-        // Paleidžiame Python skriptą VIENĄ KARTĄ su teisingais duomenimis
+
         $result = Process::run("python3 {$scriptPath} \"{$token}\" \"{$channelId}\"");
-        
+
         if (!$result->successful()) {
             Log::error("[ScraperService@runPythonScraper] Python process failed: " . $result->errorOutput());
             return null;
@@ -50,7 +47,7 @@ class ScraperService
         return json_decode($result->output(), true);
     }
 
-    private function storeBot($botName, $channelId)
+    private function syncBot($botName, $channelId)
     {
         return Bot::updateOrCreate(
             ['discord_channel_id' => $channelId],
@@ -58,47 +55,47 @@ class ScraperService
         );
     }
 
-private function storeScrapedMessages($data, $botId)
-{
-    foreach ($data as &$item) { 
-        $scrapedAt = Carbon::parse($item['time']);
+    private function storeScrapedMessages($data, $botId)
+    {
+        foreach ($data as $item) {
+            $scrapedAt = Carbon::parse($item['time']);
 
-        // Ištraukiame kainą iš teksto
-        if (preg_match('/Price:\s*([\d\.]+)/i', $item['text'], $matches)) {
-            $item['price'] = (float)$matches[1];
-        } else {
-            $item['price'] = 0;
+            if (preg_match('/Price:\s*([\d\.]+)/i', $item['text'], $matches)) {
+                $item['price'] = (float) $matches[1];
+            } else {
+                $item['price'] = 0;
+            }
+
+            $exists = ScrapedData::where('bot_id', $botId)
+                ->where('author', $item['user'])
+                ->where('content', $item['text'])
+                ->where('scraped_at', $scrapedAt)
+                ->exists();
+
+            if (!$exists) {
+                ScrapedData::create([
+                    'bot_id'     => $botId,
+                    'author'     => $item['user'],
+                    'content'    => $item['text'],
+                    'price'      => $item['price'],
+                    'scraped_at' => $scrapedAt,
+                    'item_name'  => $item['item'] ?? null,
+                ]);
+            }
         }
 
-        $exists = ScrapedData::where('bot_id', $botId)
-            ->where('author', $item['user'])
-            ->where('content', $item['text'])
-            ->where('scraped_at', $scrapedAt)
-            ->exists();
-
-        if (!$exists) {
-            ScrapedData::create([
-                'bot_id'     => $botId,
-                'author'     => $item['user'],
-                'content'    => $item['text'],
-                'price'      => $item['price'],
-                'scraped_at' => $scrapedAt,
-            ]);
-        }
+        return $data;
     }
-
-    return $data; 
-}
 
     private function storeHistory($botId, $count, $executionTime = 0, $error = null)
     {
-        \App\Models\ScrapeHistory::create([
-            'bot_id' => $botId,
-            'records_found' => $count,
-            'status' => $error ? 'failed' : 'success',
-            'execution_time' => $executionTime, 
-            'error_log' => $error,             
-            'request_ip' => request()->ip()    
+        ScrapeHistory::create([
+            'bot_id'         => $botId,
+            'records_found'  => $count,
+            'status'         => $error ? 'failed' : 'success',
+            'execution_time' => $executionTime,
+            'error_log'      => $error,
+            'request_ip'     => request()->ip(),
         ]);
     }
 }

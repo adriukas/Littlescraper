@@ -109,11 +109,15 @@
                                             <div class="row g-2">
                                                 <div class="col-6">
                                                     <label class="small fw-bold text-uppercase">Name</label>
-                                                    <input type="text" name="name" class="form-control form-control-sm" value="{{ $bot->name }}" required>
+                                                    <input type="text" name="name" class="form-control form-control-sm" value="{{ old('name', $bot->name) }}" required>
                                                 </div>
                                                 <div class="col-6">
                                                     <label class="small fw-bold text-uppercase">Channel ID</label>
-                                                    <input type="text" name="discord_channel_id" class="form-control form-control-sm" value="{{ $bot->discord_channel_id }}" required>
+                                                    <input type="text" name="discord_channel_id" class="form-control form-control-sm" value="{{ old('discord_channel_id', $bot->discord_channel_id) }}" required>
+                                                </div>
+                                                <div class="col-12 mt-1">
+                                                    <label class="small fw-bold text-uppercase">Token</label>
+                                                    <input type="password" name="token" class="form-control form-control-sm" value="{{ old('token', $bot->token) }}" required>
                                                 </div>
                                                 <div class="col-12 mt-2 text-center">
                                                     <button type="submit" class="btn btn-dark btn-sm w-100 text-uppercase">Save changes</button>
