@@ -16,4 +16,24 @@ class ScrapeHistory extends Model
     {
         return $this->belongsTo(Bot::class);
     }
+
+    public static function getAllHistory()
+    {
+        return self::with('bot')->orderBy('created_at', 'desc')->get();
+    }
+
+    public static function getById(int $id): self
+    {
+        return self::findOrFail($id);
+    }
+
+    public static function createRecord(array $data): self
+    {
+        return self::create($data);
+    }
+
+    public function deleteRecord(): bool
+    {
+        return (bool) $this->delete();
+    }
 }

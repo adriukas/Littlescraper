@@ -58,7 +58,7 @@ def parse_embed(msg, embed):
 
 def parse_messages(messages):
     results = []
-    cutoff_time = datetime.now(timezone.utc) - timedelta(hours=500)
+    cutoff_time = datetime.now(timezone.utc) - timedelta(hours=900)
 
     for msg in messages:
         timestamp_str = msg['timestamp'].replace('Z', '+00:00')

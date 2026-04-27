@@ -32,7 +32,7 @@
                     <th>Item</th>
                     <th>Price</th>
                     <th>Time</th>
-                    @if(session('user_email') === env('ADMIN_EMAIL'))
+                    @if(Auth::user()->isAdmin())
                         <th>Actions</th>
                     @endif
                 </tr>
@@ -46,7 +46,7 @@
                         <td class="text-success fw-bold">{{ number_format($item->price, 2) }} €</td>
                         <td class="text-muted small">{{ $item->scraped_at->diffForHumans() }}</td>
 
-                        @if(session('user_email') === env('ADMIN_EMAIL'))
+                        @if(Auth::user()->isAdmin())
                         <td>
                             <div class="d-flex gap-1">
                                 <form action="{{ route('history.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Delete?')">
@@ -70,7 +70,7 @@
     </div>
 </div>
 
-@if(session('user_email') === env('ADMIN_EMAIL'))
+@if(Auth::user()->isAdmin())
     @foreach($purchases as $item)
         <div class="modal fade text-dark" id="editSale{{ $item->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">

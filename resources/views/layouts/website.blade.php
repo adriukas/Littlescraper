@@ -62,9 +62,12 @@
                     <a href="{{ route('home') }}" class="btn btn-outline-light btn-sm text-uppercase">Back to bot list</a>
                 @endif
                 
-                @if(session('is_logged_in'))
+                @auth
+                    @if(Auth::user()->isAdmin())
+                        <span class="badge bg-danger text-uppercase me-1">Admin</span>
+                    @endif
                     <a href="{{ route('logout') }}" class="btn btn-danger text-uppercase btn-sm shadow-sm">Log out</a>
-                @endif
+                @endauth
             </div>
         </div>
     </nav>
@@ -100,5 +103,11 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <footer class="bg-dark text-secondary text-center py-3 mt-5" style="font-size: 0.8rem;">
+        <div class="container">
+            &copy; {{ date('Y') }} Discord Scraper &mdash; Vilnius University project
+        </div>
+    </footer>
 </body>
 </html>

@@ -26,7 +26,7 @@
                     <th>Author</th>
                     <th>Message</th>
                     <th>Time</th>
-                    @if(session('user_email') === env('ADMIN_EMAIL'))
+                    @if(Auth::user()->isAdmin())
                         <th>Actions</th>
                     @endif
                 </tr>
@@ -39,7 +39,7 @@
                         <td>{{ $item->content }}</td>
                         <td class="text-muted small">{{ $item->scraped_at->diffForHumans() }}</td>
 
-                        @if(session('user_email') === env('ADMIN_EMAIL'))
+                        @if(Auth::user()->isAdmin())
                         <td>
                             <div class="d-flex gap-1">
                                 <form action="{{ route('history.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Delete this record permanently?')">
@@ -65,7 +65,7 @@
     </div>
 </div>
 
-@if(session('user_email') === env('ADMIN_EMAIL'))
+@if(Auth::user()->isAdmin())
     @foreach($purchases as $item)
         <div class="modal fade" id="editMsg{{ $item->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">

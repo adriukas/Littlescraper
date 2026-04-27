@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Services\ScraperService;
 use App\Models\ScrapedData;
 use App\Models\Bot;
-use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class ScraperController extends Controller
@@ -31,13 +32,13 @@ class ScraperController extends Controller
                 'botName'   => $botName,
                 'channelId' => $channelId,
                 'purchases' => null,
-                'totalSum'  => 0
+                'totalSum'  => 0,
             ]);
         }
 
         $request->validate([
             'channel_id' => 'required|numeric',
-            'bot_name'   => 'required|string',
+            'bot_name'   => 'required|string|max:100',
         ]);
 
         Log::info("[ScraperController@runScraper] Scrape started for bot: {$botName} (channel: {$channelId})");
@@ -55,7 +56,7 @@ class ScraperController extends Controller
             'purchases' => $filteredData,
             'channelId' => $channelId,
             'botName'   => $botName,
-            'totalSum'  => $totalSum
+            'totalSum'  => $totalSum,
         ]);
     }
 
@@ -86,37 +87,39 @@ class ScraperController extends Controller
 
     public function destroy($id)
     {
-        $data = ScrapedData::find($id);
-
-        if (!$data) {
-            return back()->with('error', 'Record not found.');
+        if (!Auth::user()->isAdmin()) {
+            abort(403, 'Only admins can delete records.');
         }
 
-        $data->delete();
-        Log::info("[ScraperController@destroy] Admin deleted record ID: " . $id);
+        $data = ScrapedData::getById($id);
+        $data->deleteRecord();
 
+        Log::info("[ScraperController@destroy] Admin deleted record ID: {$id} — user: " . Auth::user()->email);
         return back()->with('success', 'Record deleted successfully.');
     }
 
     public function update(Request $request, $id)
     {
+        if (!Auth::user()->isAdmin()) {
+            abort(403, 'Only admins can edit records.');
+        }
+
         $request->validate([
             'author'    => 'required|string|max:255',
-            'content'   => 'required|string',
-            'price'     => 'nullable|numeric',
+            'content'   => 'required|string|max:2000',
+            'price'     => 'nullable|numeric|min:0',
             'item_name' => 'nullable|string|max:255',
         ]);
 
-        $item = ScrapedData::findOrFail($id);
-        $item->update([
+        $item = ScrapedData::getById($id);
+        $item->updateRecord([
             'author'    => $request->author,
             'content'   => $request->content,
             'price'     => $request->price ?? $item->price,
             'item_name' => $request->item_name ?? $item->item_name,
         ]);
 
-        Log::info("[ScraperController@update] Record ID {$id} updated by admin.");
-
+        Log::info("[ScraperController@update] Record ID {$id} updated by admin: " . Auth::user()->email);
         return back()->with('success', 'Record updated successfully!');
     }
 }

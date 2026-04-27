@@ -89,7 +89,7 @@ class ScraperService
 
     private function storeHistory($botId, $count, $executionTime = 0, $error = null)
     {
-        ScrapeHistory::create([
+        ScrapeHistory::createRecord([
             'bot_id'         => $botId,
             'records_found'  => $count,
             'status'         => $error ? 'failed' : 'success',

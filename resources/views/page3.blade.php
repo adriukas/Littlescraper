@@ -23,7 +23,7 @@
                                 </button>
                             </form>
 
-                            @if(session('user_email') === env('ADMIN_EMAIL'))
+                            @if(Auth::user()->isAdmin())
                                 <div style="position: absolute; top: -12px; right: -5px; z-index: 10; display: flex; gap: 5px;">
                                     <button type="button" class="btn btn-secondary btn-sm rounded-circle shadow border-2 border-white" style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center;" data-bs-toggle="collapse" data-bs-target="#editForm{{ $bot->id }}">
                                         <i class="bi bi-pencil-fill" style="font-size: 0.75rem; color: white;"></i>
@@ -86,7 +86,7 @@
                                 </button>
                             </form>
 
-                            @if(session('user_email') === env('ADMIN_EMAIL'))
+                            @if(Auth::user()->isAdmin())
                                 <div style="position: absolute; top: -12px; right: -5px; z-index: 10; display: flex; gap: 5px;">
                                     <button type="button" class="btn btn-secondary btn-sm rounded-circle shadow border-2 border-white" style="width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center;" data-bs-toggle="collapse" data-bs-target="#editForm{{ $bot->id }}">
                                         <i class="bi bi-pencil-fill" style="font-size: 0.75rem; color: white;"></i>
@@ -141,7 +141,7 @@
             <a href="{{ route('history.messages') }}" class="btn btn-outline-warning px-4 small fw-bold text-uppercase text-dark">Messages history</a>
         </div>
         
-        @if(session('user_email') === env('ADMIN_EMAIL'))
+        @if(Auth::user()->isAdmin())
             <div class="mt-4 p-4 bg-light rounded-3 border shadow-sm text-start">
                 <p class="text-secondary fw-bold mb-4 text-uppercase border-bottom pb-2">
                     Admin panel / Add new bot
